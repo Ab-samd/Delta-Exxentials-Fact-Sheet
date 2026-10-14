@@ -487,7 +487,7 @@ DeltaExxentials 2.0 includes AI Governance, Email Threat Monitoring (M365), Quar
 <tr><td>Monthly Subscription Subtotal (<span class="curr-lbl">USD</span>)</td><td class="num" id="sumSubtotal">0.00</td></tr>
 <tr><td>Contract Period Selected</td><td class="num" id="sumContractPeriod">—</td></tr>
 <tr><td>Annual Upfront Payment Incentive (5%)</td><td class="num" id="sumDiscount">0.00</td></tr>
-<tr id="partnerCommissionRow" style="display:none;"><td>Partner Commission (30%)</td><td class="num" id="sumPartnerCommission">0.00</td></tr>
+<tr id="partnerCommissionRow" style="display:none;"><td id="partnerCommissionLabel">Partner Commission (30%)</td><td class="num" id="sumPartnerCommission">0.00</td></tr>
 <tr class="grand"><td>TOTAL CONTRACT VALUE FOR CONTRACT PERIOD</td><td class="num" id="sumContractIncl">0.00</td></tr>
 <tr><td>Payment Option Selected</td><td class="num" id="sumPaymentOption">—</td></tr>
 <tr class="grand"><td>AMOUNT PAYABLE TODAY</td><td class="num" id="sumTodayIncl">0.00</td></tr>
@@ -497,7 +497,7 @@ DeltaExxentials 2.0 includes AI Governance, Email Threat Monitoring (M365), Quar
 <button type="button" id="generateQuoteBtn" style="background:var(--navy); color:#fff; border:none; padding:11px 22px; border-radius:5px; font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer;">Generate BoM</button>
 <span id="quoteGenMsg"></span>
 </div>
-<p class="lede" id="partnerSummaryNote" style="margin-top:10px; margin-bottom:0; display:none;">Opens a BoM in a new tab, laid out per DeltaSpike's standard BoM/quotation format. For an authorized Partner, both the BoM and this summary reflect pricing net of the 30% Partner Commission.</p>
+<p class="lede" id="partnerSummaryNote" style="margin-top:10px; margin-bottom:0; display:none;">Opens a BoM in a new tab, laid out per DeltaSpike's standard BoM/quotation format. For an authorized Partner, both the BoM and this summary reflect pricing net of the applicable Partner Commission.</p>
 <p class="lede" id="clientSummaryNote" style="margin-top:10px; margin-bottom:0;">Opens a BoM in a new tab, laid out per DeltaSpike's standard BoM/quotation format.</p>
 </div>
 
@@ -517,7 +517,7 @@ DeltaExxentials 2.0 includes AI Governance, Email Threat Monitoring (M365), Quar
 <li>Firewall Integration and, for DeltaExxentials customers, Email Monitoring service fees are computed per the rate-card formula and reflected in Section 2. Add-on services selected in Section 1B form part of the same subscription order.</li>
 <li>Firewall Integration requires 2 GB/day of NGSIEM log ingestion for every firewall unit added (e.g. 2 units require 4 GB/day), for both DeltaExxentials and DeltaExxentials 2.0. "Additional NGSIEM" volume is entered as GB/day beyond the bundled MOQ and is billed as entered. Both are billed in full and are never offset by DeltaExxentials 2.0's included 2 GB/day baseline, which covers only the bundle's own Email/AI usage; DeltaExxentials (entry tier) has no included baseline at all, so Firewall Integration, Email Monitoring, and any additional volume requested are all billed in full.</li>
 <li>Email Threat Monitoring supports Microsoft 365 and Microsoft Defender telemetry only. Other email platforms are not supported under this offering.</li>
-<li id="termPartnerCommission" style="display:none;">A 30% Partner Commission applies where this BoM is issued to an authorized Partner (Section 0).</li>
+<li id="termPartnerCommission" style="display:none;">A 30% Partner Commission applies to this BoM, as [partner name] is an authorized Partner (Section 0).</li>
 <li>All pricing in this document reflects regional price structures from the official matrix, defaulting unlisted regions to US region pricing.</li>
 <li>The DeltaSpike Group contracting entity, registered office address and named contacts shown in Section 5 (and reflected in the generated BoM) are determined by the Client Origin Country selected in Section 1. This routing affects office/contact details only and has no effect on the currency or pricing shown, which follow the Regional Pricing Matrix independently.</li>
 <li>All amounts are indicative until confirmed in a formal quotation or invoice issued by the DeltaSpike Group entity named in Section 5.</li>
@@ -541,14 +541,41 @@ DeltaExxentials 2.0 includes AI Governance, Email Threat Monitoring (M365), Quar
 
 <script>
 (function(){
-var PARTNER_COMMISSION = 0.30; // 30% partner commission
+var PARTNER_COMMISSION = 0.30; // Standard partner commission (all regions except US)
+var PARTNER_COMMISSION_US = 0.25; // Reduced commission for US-region partners
+// Each authorized partner is tagged with its region. US-region partners receive
+// PARTNER_COMMISSION_US (25%) instead of the standard PARTNER_COMMISSION (30%).
+// Currently "Reddy" is the only US-region partner; add further US partners here
+// (region: "US") as they come on \u2014 no other code changes are needed.
 var AUTHORIZED_PARTNERS = [
-"Ask4key", "Bumi Optimus", "Core Memory", "CATO", "CrowdStrike",
-"CSM", "CTC", "Ezidea", "EGL", "EN", "Fentons", "Hurricane",
-"Imperium", "IshanTech", "JOS", "Monarch", "NTT Data", "Qumulo",
-"Reddy", "Starhub", "Strategic Alliance", "Strateq", "Thakral",
-"TM", "Time", "Titan System", "ViewQWest"
+{ name: "Ask4key", region: "Other" }, { name: "Bumi Optimus", region: "Other" },
+{ name: "Core Memory", region: "Other" }, { name: "CATO", region: "Other" },
+{ name: "CrowdStrike", region: "Other" }, { name: "CSM", region: "Other" },
+{ name: "CTC", region: "Other" }, { name: "Ezidea", region: "Other" },
+{ name: "EGL", region: "Other" }, { name: "EN", region: "Other" },
+{ name: "Fentons", region: "Other" }, { name: "Hurricane", region: "Other" },
+{ name: "Imperium", region: "Other" }, { name: "IshanTech", region: "Other" },
+{ name: "JOS", region: "Other" }, { name: "Monarch", region: "Other" },
+{ name: "NTT Data", region: "Other" }, { name: "Qumulo", region: "Other" },
+{ name: "Reddy", region: "US" }, { name: "Starhub", region: "Other" },
+{ name: "Strategic Alliance", region: "Other" }, { name: "Strateq", region: "Other" },
+{ name: "Thakral", region: "Other" }, { name: "TM", region: "Other" },
+{ name: "Time", region: "Other" }, { name: "Titan System", region: "Other" },
+{ name: "ViewQWest", region: "Other" }
 ];
+function findAuthorizedPartner(nameInput){
+var needle = (nameInput || '').trim().toLowerCase();
+if (!needle) return null;
+for (var i=0;i<AUTHORIZED_PARTNERS.length;i++){
+if (AUTHORIZED_PARTNERS[i].name.toLowerCase() === needle) return AUTHORIZED_PARTNERS[i];
+}
+return null;
+}
+function partnerCommissionRateFor(nameInput){
+var p = findAuthorizedPartner(nameInput);
+if (!p) return PARTNER_COMMISSION;
+return p.region === 'US' ? PARTNER_COMMISSION_US : PARTNER_COMMISSION;
+}
 
 var REGIONAL_PRICING = {
 'UK': { currency: 'GBP', x1: { T1: 7.99, T2: 6.99 }, x2: { T1: 12.99, T2: 10.99 } },
@@ -665,7 +692,7 @@ var OFFICE_BY_COUNTRY = {
   'United Arab Emirates': 'UK', 'Saudi Arabia': 'UK', 'Qatar': 'UK', 'Kuwait': 'UK',
   'Bahrain': 'UK', 'Oman': 'UK', 'Jordan': 'UK', 'Israel': 'UK',
   'Egypt': 'UK', 'Algeria': 'UK', 'Nigeria': 'UK', 'Kenya': 'UK', 'South Africa': 'UK',
-  'Afghanistan': 'MY', 'Bangladesh': 'MY', 'Pakistan': 'MY', 'India': 'MY',
+  'Afghanistan': 'LK', 'Bangladesh': 'LK', 'Pakistan': 'LK', 'India': 'LK',
   'Australia': 'MY', 'New Zealand': 'MY', 'Indonesia': 'MY', 'Thailand': 'MY',
   'Vietnam': 'MY', 'Philippines': 'MY', 'Brunei': 'MY', 'Cambodia': 'MY', 'Laos': 'MY',
   'China': 'MY', 'Hong Kong': 'MY', 'Macau': 'MY', 'Taiwan': 'MY', 'Japan': 'MY', 'South Korea': 'MY',
@@ -826,11 +853,10 @@ if (state.dealType === 'partner') {
 if (partnerInput === '') {
 msgEl.innerHTML = '<span class="check-msg pending">Please enter a partner name</span>';
 } else {
-var matched = AUTHORIZED_PARTNERS.some(function(p){
-return p.toLowerCase() === partnerInput.toLowerCase();
-});
+var matched = !!findAuthorizedPartner(partnerInput);
 if (matched) {
-msgEl.innerHTML = '<span class="check-msg ok">Authorized Partner verified</span>';
+var rate = partnerCommissionRateFor(partnerInput);
+msgEl.innerHTML = '<span class="check-msg ok">Authorized Partner verified \u2014 ' + Math.round(rate*100) + '% commission applies</span>';
 } else {
 msgEl.innerHTML = '<span class="check-msg warn">Invalid partner name. Please choose from the official list.</span>';
 }
@@ -897,15 +923,21 @@ var hasEPInput = $('totalEP').value !== '';
 var curr = state.currency || 'USD';
 var isPartner = (state.dealType === 'partner');
 var partnerInput = $('partnerName').value.trim();
-var isAuthorizedPartner = isPartner && AUTHORIZED_PARTNERS.some(function(p){
-return p.toLowerCase() === partnerInput.toLowerCase();
-});
+var isAuthorizedPartner = isPartner && !!findAuthorizedPartner(partnerInput);
+var partnerCommissionRate = isAuthorizedPartner ? partnerCommissionRateFor(partnerInput) : 0;
 
 // Update conditional visibility for Partner Commission text notes
 if (isAuthorizedPartner) {
   $('partnerSummaryNote').style.display = '';
   $('clientSummaryNote').style.display = 'none';
   $('termPartnerCommission').style.display = '';
+  $('partnerCommissionLabel').textContent = 'Partner Commission (' + Math.round(partnerCommissionRate*100) + '%)';
+  var appliedPct = Math.round(partnerCommissionRate*100);
+  if (partnerCommissionRate === PARTNER_COMMISSION_US) {
+    $('termPartnerCommission').textContent = 'A ' + appliedPct + '% Partner Commission applies to this BoM, as ' + partnerInput + ' is an authorized Partner based in the US region (Section 0).';
+  } else {
+    $('termPartnerCommission').textContent = 'A ' + appliedPct + '% Partner Commission applies to this BoM, as ' + partnerInput + ' is an authorized Partner (Section 0).';
+  }
 } else {
   $('partnerSummaryNote').style.display = 'none';
   $('clientSummaryNote').style.display = '';
@@ -1075,14 +1107,14 @@ var contractExcl = subtotal * contractMonths;
 var discount = (state.paymentOption === 'full') ? contractExcl * 0.05 : 0;
 var contractExclAfterDiscount = contractExcl - discount;
 
-var partnerCommission = isAuthorizedPartner ? contractExclAfterDiscount * PARTNER_COMMISSION : 0;
+var partnerCommission = isAuthorizedPartner ? contractExclAfterDiscount * partnerCommissionRate : 0;
 var contractIncl = contractExclAfterDiscount - partnerCommission;
 
 var todayExcl = 0;
 if (state.paymentOption === 'full'){
 todayExcl = contractIncl;
 } else if (state.paymentOption === 'monthly'){
-var monthlyCommission = isAuthorizedPartner ? subtotal * PARTNER_COMMISSION : 0;
+var monthlyCommission = isAuthorizedPartner ? subtotal * partnerCommissionRate : 0;
 todayExcl = subtotal - monthlyCommission;
 }
 var todayIncl = todayExcl;
@@ -1110,6 +1142,7 @@ subtotal: subtotal,
 contractMonths: contractMonths,
 discount: discount,
 partnerCommission: partnerCommission,
+partnerCommissionRate: partnerCommissionRate,
 contractExclAfterDiscount: contractExclAfterDiscount,
 contractIncl: contractIncl,
 paymentOptionLabel: state.paymentOption === 'full' ? 'Full Payment' : (state.paymentOption === 'monthly' ? 'Monthly Payment' : null),
@@ -1172,7 +1205,7 @@ return (
 }
 
 function buildQuotationHtml(q){
-var discountPct = (q.discount > 0 ? '5%' : '0%') + (q.partnerCommission > 0 ? ' + 30%' : '');
+var discountPct = (q.discount > 0 ? '5%' : '0%') + (q.partnerCommission > 0 ? ' + ' + Math.round((q.partnerCommissionRate||0)*100) + '%' : '');
 var coreLines = q.lines.filter(function(l){ return q.tier && l.sku === q.tier.sku; });
 var addonLines = q.lines.filter(function(l){ return !(q.tier && l.sku === q.tier.sku); });
 var curr = q.currency || 'USD';
@@ -1227,7 +1260,7 @@ return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
 '<strong>Client Origin Country:</strong> ' + esc(q.country || '\u2014') + '<br>' +
 '<strong>BoM Currency:</strong> ' + curr + ' (Regional Equivalents Matrix)<br>' +
 '<strong>Contract Period:</strong> ' + esc(q.contractMonths || '\u2014') + ' Month(s)<br>' +
-(q.partnerCommission > 0 ? '<strong>Partner Commission (30%):</strong> -' + curr + ' ' + fmt(q.partnerCommission) + '<br>' : '') +
+(q.partnerCommission > 0 ? '<strong>Partner Commission (' + Math.round((q.partnerCommissionRate||0)*100) + '%):</strong> -' + curr + ' ' + fmt(q.partnerCommission) + '<br>' : '') +
 '<strong>Total Contract Value (excl. applicable local taxes / SST):</strong> ' + curr + ' ' + fmt(q.contractIncl) + '<br>' +
 '<strong>Amount Payable Today (excl. applicable local taxes / SST):</strong> ' + curr + ' ' + fmt(q.todayIncl) + '<br>' +
 '<strong>Service Line:</strong> ' + esc(q.product || '\u2014') + '<br>' +
